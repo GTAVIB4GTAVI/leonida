@@ -630,17 +630,6 @@ it writes the command into that buffer itself instead of calling: a root argumen
 per-root-parameter table at `+0x344` and then the value (32 bits for a descriptor table, 64 for the slot-41 GPU VA),
 a dispatch four words (`0x4002c400`, or `(flag | 0x1000ba00) << 2`, then x, y, z).
 The BVH builder also writes a five-word dispatch, `0x4003cc00, x, 1, 1, W`.
-- **Sites:** `0x14972`, `0x15215`, `0x1536a` and `0x1d002`, each checked against the dispatch limit `+0x28`. The
-  cursor advances 20 bytes and the flag byte at `+0x140` is cleared.
-- **It is the inline form of console slot 80** (section 3.3a). When the buffer is full, each site calls slot 80
-  (`+0x280`) instead, as `(x, 1, 1, W)` with the same `W`.
-- **`W` is `0x8020`** at `0x14972` and `0x1d002`, and **`0x20`** at `0x15215` and `0x1536a`. What bit 15 selects is
-  open.
-
-The FSR DLL never writes this form.
-**Byte `+0x143` is console-runtime state:** the BVH builder reads it at 31 sites and the FSR DLL at one (all `cmp
-byte ptr [reg+143h]`), but neither DLL writes it. Every store into `+0x140`..`+0x143` in either DLL is a byte store to
-`+0x140` or `+0x141`, and no wider store reaches `+0x143`. A replacement list can leave it 0.
 It sets a flag byte at `+0x140`, stores a flag at `+0x141` from the
 pipeline, and copies 32 bytes of the pipeline object (from its `+0x10`) to `+0x544`. These are the fields
 section 3.4 measured in the BVH builder's helper without a meaning (`+0x18`, `+0x30`, `+0x140`, `+0x344`, `+0x544`).
